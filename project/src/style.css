@@ -272,8 +272,9 @@ body {
 /* time slider settings */
 .time-slider {
   position: absolute;
-  bottom: 50px;
-  left: 10px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.9);
   padding: 5px 6px;
   border-radius: 6px;
