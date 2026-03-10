@@ -1,0 +1,599 @@
+{
+  "version": 8,
+  "id": "933ba1d3-2d03-46b6-8ed9-9eb848c5b585",
+  "name": "PEC Locations Base",
+  "sources": {
+    "mask": {
+      "type": "geojson",
+      "data": "./data/mask.geojson"
+    },
+    "terrain-rgb": {
+      "url": "https://api.maptiler.com/tiles/terrain-rgb-v2/tiles.json?key=VR7FKTd6lXA4PKRQVzfY",
+      "type": "raster-dem"
+    },
+    "maptiler_planet": {
+      "url": "https://api.maptiler.com/tiles/v3/tiles.json?key=VR7FKTd6lXA4PKRQVzfY",
+      "type": "vector"
+    },
+    "hillshade": {
+      "type": "raster",
+      "tiles": [
+        "https://kygisserver.ky.gov/arcgis/rest/services/WGS84WM_Services/Ky_MultiDirectional_Hillshade_WGS84WM/MapServer/tile/{z}/{y}/{x}"
+      ],
+      "tileSize": 256,
+      "maxzoom": 20
+    },
+    "aerial": {
+      "type": "raster",
+      "tiles": [
+        "https://kygisserver.ky.gov/arcgis/rest/services/WGS84WM_Services/Ky_Imagery_Phase3_3IN_WGS84WM/MapServer/tile/{z}/{y}/{x}"
+      ],
+      "tileSize": 256,
+      "maxzoom": 21
+    },
+    "terrainSource": {
+      "type": "raster-dem",
+      "url": "terrain.json",
+      "tileSize": 256
+    }
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "background",
+      "paint": {
+        "background-color": "#f5f5f5",
+        "background-opacity": 1
+      }
+    },
+    {
+      "id": "hillshade",
+      "type": "hillshade",
+      "source": "terrain-rgb",
+      "minzoom": 3,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "hillshade-accent-color": "hsl(223, 14%, 92%)",
+        "hillshade-exaggeration": {
+          "stops": [
+            [6, 0.5],
+            [12, 0.6],
+            [14, 0.7]
+          ]
+        },
+        "hillshade-shadow-color": "hsl(201, 10%, 81%)",
+        "hillshade-highlight-color": "hsl(245, 6%, 54%)"
+      }
+    },
+    {
+      "id": "aerial",
+      "type": "raster",
+      "source": "aerial",
+      "minzoom": 13,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "raster-brightness-min": 0.3,
+        "raster-saturation": 0.35,
+        "raster-hue-rotate": 10,
+        "raster-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          0,
+          13,
+          0.35,
+          14,
+          0.7,
+          15,
+          0.92
+        ]
+      }
+    },
+    {
+      "id": "Residential",
+      "type": "fill",
+      "source": "maptiler_planet",
+      "source-layer": "landuse",
+      "maxzoom": 18,
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "fill-color": [
+          "interpolate",
+          ["exponential", 1],
+          ["zoom"],
+          1,
+          "hsl(18, 20%, 96%)",
+          12,
+          "hsla(18, 20%, 96%, 0.75)",
+          16,
+          "hsla(18, 20%, 96%, 0.5)",
+          18,
+          "hsla(18, 20%, 96%, 0.15)"
+        ],
+        "fill-opacity": 1
+      },
+      "filter": [
+        "all",
+        ["==", "$type", "Polygon"],
+        ["in", "class", "residential", "suburb", "neighbourhood"]
+      ]
+    },
+    {
+      "id": "Water-lines",
+      "type": "line",
+      "source": "maptiler_planet",
+      "source-layer": "waterway",
+      "layout": {
+        "visibility": "visible",
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#bdd9ee",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          6,
+          0.4,
+          10,
+          0.8,
+          14,
+          1.6,
+          18,
+          3
+        ],
+        "line-opacity": 0.9
+      }
+    },
+    {
+      "id": "Water-fill",
+      "type": "fill",
+      "source": "maptiler_planet",
+      "source-layer": "water",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "fill-color": "#dcecf7",
+        "fill-opacity": 1
+      },
+      "filter": ["==", "$type", "Polygon"]
+    },
+    {
+      "id": "Road-minor",
+      "type": "line",
+      "source": "maptiler_planet",
+      "source-layer": "transportation",
+      "minzoom": 9,
+      "layout": {
+        "visibility": "visible",
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#f5f5f5",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10,
+          0.6,
+          12,
+          1.1,
+          14,
+          2,
+          16,
+          3.2,
+          18,
+          5.5
+        ],
+        "line-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10,
+          0.7,
+          12,
+          0.68,
+          13,
+          0.62,
+          14,
+          0.55,
+          15,
+          0.4,
+          16,
+          0.3,
+          18,
+          0.1
+        ]
+      },
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        [
+          "in",
+          "class",
+          "minor",
+          "service",
+          "street",
+          "street_limited",
+          "path",
+          "track"
+        ]
+      ]
+    },
+
+    {
+      "id": "Road-major-casing",
+      "type": "line",
+      "source": "maptiler_planet",
+      "source-layer": "transportation",
+      "minzoom": 7,
+      "layout": {
+        "visibility": "visible",
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#5f88a8",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          7,
+          1.2,
+          10,
+          2.4,
+          12,
+          4.1,
+          14,
+          6.8,
+          16,
+          11,
+          18,
+          17
+        ],
+        "line-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          7,
+          0.72,
+          10,
+          0.7,
+          12,
+          0.62,
+          13,
+          0.5,
+          14,
+          0.35,
+          15,
+          0.2,
+          16,
+          0.1,
+          18,
+          0
+        ]
+      },
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["in", "class", "primary", "secondary", "tertiary", "trunk", "motorway"]
+      ]
+    },
+    {
+      "id": "Road-major",
+      "type": "line",
+      "source": "maptiler_planet",
+      "source-layer": "transportation",
+      "minzoom": 7,
+      "layout": {
+        "visibility": "visible",
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#f5f5f5",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          7,
+          0.7,
+          10,
+          1.4,
+          12,
+          2.6,
+          14,
+          4.8,
+          16,
+          8,
+          18,
+          13
+        ],
+        "line-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          7,
+          0.72,
+          10,
+          0.7,
+          12,
+          0.62,
+          13,
+          0.5,
+          14,
+          0.35,
+          15,
+          0.2,
+          16,
+          0.1,
+          18,
+          0
+        ]
+      },
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        ["in", "class", "primary", "secondary", "tertiary", "trunk", "motorway"]
+      ]
+    },
+    {
+      "id": "Road-bridge",
+      "type": "line",
+      "source": "maptiler_planet",
+      "source-layer": "transportation",
+      "minzoom": 7,
+      "layout": {
+        "visibility": "visible",
+        "line-cap": "round",
+        "line-join": "round"
+      },
+      "paint": {
+        "line-color": "#f5f5f5",
+        "line-width": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          10,
+          1.4,
+          12,
+          2.7,
+          14,
+          5,
+          16,
+          8.3,
+          18,
+          13
+        ],
+        "line-opacity": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          7,
+          0.72,
+          10,
+          0.7,
+          12,
+          0.62,
+          13,
+          0.5,
+          14,
+          0.35,
+          15,
+          0.2,
+          16,
+          0.1,
+          18,
+          0
+        ]
+      },
+      "filter": [
+        "all",
+        ["==", "$type", "LineString"],
+        [
+          "in",
+          "class",
+          "primary",
+          "secondary",
+          "tertiary",
+          "trunk",
+          "motorway"
+        ],
+        ["==", "brunnel", "bridge"]
+      ]
+    },
+    {
+      "id": "elliott-boundary-glow-light",
+      "type": "line",
+      "source": "mask",
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "rgba(29,144,228,0.18)",
+        "line-width": 12
+      }
+    },
+    {
+      "id": "elliott-boundary-glow",
+      "type": "line",
+      "source": "mask",
+      "layout": {
+        "line-join": "round",
+        "line-cap": "round"
+      },
+      "paint": {
+        "line-color": "rgba(29,144,228,0.3)",
+        "line-width": 8
+      }
+    },
+    {
+      "id": "aoi-boundary",
+      "type": "line",
+      "source": "mask",
+      "paint": {
+        "line-color": "#1D90E4",
+        "line-width": 3
+      }
+    },
+    {
+      "id": "River-labels",
+      "type": "symbol",
+      "source": "maptiler_planet",
+      "source-layer": "waterway",
+      "minzoom": 13,
+      "layout": {
+        "visibility": "visible",
+        "symbol-placement": "line",
+        "symbol-spacing": 350,
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "text-font": ["Libre Franklin Italic"],
+        "text-letter-spacing": 0.1,
+        "text-max-width": 6,
+        "text-offset": [0, 0],
+        "text-rotation-alignment": "map",
+        "text-size": ["interpolate", ["linear"], ["zoom"], 6, 9, 16, 11]
+      },
+      "paint": {
+        "text-color": "rgba(55, 105, 145, 0.98)",
+        "text-halo-color": "#FFFFFF",
+        "text-halo-width": 1.6,
+        "text-halo-blur": 0.9
+      },
+      "filter": ["all", ["==", "$type", "LineString"], ["has", "name"]]
+    },
+    {
+      "id": "Lakeline-labels",
+      "type": "symbol",
+      "source": "maptiler_planet",
+      "source-layer": "water_name",
+      "minzoom": 0,
+      "layout": {
+        "visibility": "visible",
+        "icon-anchor": "center",
+        "symbol-placement": "line",
+        "text-anchor": "center",
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "text-font": ["Libre Franklin Italic"],
+        "text-justify": "center",
+        "text-letter-spacing": 0.1,
+        "text-max-width": 5,
+        "text-size": ["interpolate", ["linear"], ["zoom"], 10, 12, 14, 16]
+      },
+      "paint": {
+        "text-color": "rgba(55, 105, 145, 0.98)",
+        "text-halo-color": "#FFFFFF",
+        "text-halo-width": 1.8,
+        "text-halo-blur": 0.7
+      },
+      "filter": ["==", "$type", "LineString"]
+    },
+    {
+      "id": "Road-labels",
+      "type": "symbol",
+      "source": "maptiler_planet",
+      "source-layer": "transportation_name",
+      "minzoom": 12,
+      "layout": {
+        "visibility": "visible",
+        "symbol-placement": "line",
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "text-font": ["Libre Franklin Regular"],
+        "text-size": [
+          "interpolate",
+          ["linear"],
+          ["zoom"],
+          12,
+          10,
+          14,
+          11,
+          16,
+          12
+        ],
+        "text-letter-spacing": 0.02,
+        "symbol-spacing": 400
+      },
+      "paint": {
+        "text-color": "#ffffff",
+        "text-halo-color": "rgba(55, 105, 145, 0.98)",
+        "text-halo-width": 1.8,
+        "text-halo-blur": 0.7
+      }
+    },
+    {
+      "id": "Place-labels-village-town-city",
+      "type": "symbol",
+      "source": "maptiler_planet",
+      "source-layer": "place",
+      "minzoom": 6,
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "text-font": ["Libre Franklin SemiBold"],
+        "text-size": ["step", ["zoom"], 11, 7, 12, 10, 14, 13, 16],
+        "text-transform": "none"
+      },
+      "paint": {
+        "text-color": "#ffffff",
+        "text-halo-color": "rgba(55, 105, 145, 0.98)",
+        "text-halo-width": 1.8,
+        "text-halo-blur": 0.7
+      },
+      "filter": ["in", "class", "village", "town", "city"]
+    },
+    {
+      "id": "Place-labels-state",
+      "type": "symbol",
+      "source": "maptiler_planet",
+      "source-layer": "place",
+      "minzoom": 4,
+      "maxzoom": 10,
+      "layout": {
+        "visibility": "visible",
+        "text-field": ["coalesce", ["get", "name:en"], ["get", "name"]],
+        "text-font": ["Libre Franklin Bold"],
+        "text-size": ["interpolate", ["linear"], ["zoom"], 4, 11, 6, 13, 8, 15],
+        "text-letter-spacing": 0.08
+      },
+      "paint": {
+        "text-color": "rgba(55, 105, 145, 0.8)",
+        "text-halo-color": "#FFFFFF",
+        "text-halo-width": 1.8,
+        "text-halo-blur": 0.7
+      },
+      "filter": ["in", "class", "state", "province"]
+    },
+    {
+      "id": "aoi-mask",
+      "type": "fill",
+      "source": "mask",
+      "layout": {
+        "visibility": "visible"
+      },
+      "paint": {
+        "fill-color": "#f5f5f5",
+        "fill-opacity": 0.9
+      }
+    }
+  ],
+  "metadata": {
+    "maptiler:copyright": "This style was generated on MapTiler Cloud. Usage outside of MapTiler Cloud requires valid MapTiler Data Package: https://www.maptiler.com/data/package/ -- please contact us."
+  },
+  "glyphs": "https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=VR7FKTd6lXA4PKRQVzfY",
+  "sprite": "https://api.maptiler.com/maps/outdoor-v2/sprite",
+  "bearing": 0,
+  "pitch": 0,
+  "center": [0, 0],
+  "zoom": 1
+}
