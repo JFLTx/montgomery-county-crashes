@@ -944,6 +944,7 @@ function buildCrashPopupHTML(props, streetViewURL) {
   const weather = safeValue(props.Weather);
   const rdwyCondition = safeValue(props.RdwyConditionCode);
   const manner = safeValue(props.MannerofCollision);
+  const date = safeValue(props.CollisionDate);
   const suffix = props.StreetSfx ? ` ${props.StreetSfx}` : "";
 
   const milePointRaw = safeValue(props.Milepoint);
@@ -978,7 +979,10 @@ function buildCrashPopupHTML(props, streetViewURL) {
   return `
     <div style="font-family: Libre Franklin, sans-serif; line-height: 1.4;">
       <div>
-        <strong>${kabco}</strong> at MP ${milePointHTML} on ${roadwayName}${suffix} at ${collisionTime}
+        <strong>${kabco}</strong> at MP ${milePointHTML} on ${roadwayName}${suffix}
+      </div>
+       <div style="margin-top: 6px;">
+        <strong>Collision Date:</strong> ${date} at ${collisionTime}
       </div>
       <div style="margin-top: 6px;">
         <strong>Conditions:</strong> ${weather}, ${rdwyCondition} Conditions
