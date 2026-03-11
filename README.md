@@ -1,2 +1,2 @@
 # montgomery-county-crashes
-Montgomery County, KY crashes from 01/01/2021 to 12/31/2025
+Montgomery County, KY crashes from Jan. 1, 2021 to Dec. 31, 2025.
